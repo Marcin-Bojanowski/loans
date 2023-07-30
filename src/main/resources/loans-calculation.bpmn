@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1jt2hyz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.13.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.2.0">
+  <bpmn:process id="LoansCalculation" name="LoansCalculation" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_03f2iv6</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_03f2iv6" sourceRef="StartEvent_1" targetRef="Activity_0awwch9" />
+    <bpmn:exclusiveGateway id="Gateway_1hcni4h">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0juvuag</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rac37j</bpmn:outgoing>
+      <bpmn:outgoing>Flow_17dar9z</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Event_1m2q52v">
+      <bpmn:incoming>Flow_1rac37j</bpmn:incoming>
+      <bpmn:incoming>Flow_1gcjcm5</bpmn:incoming>
+      <bpmn:incoming>Flow_0o7n8xj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1rac37j" sourceRef="Gateway_1hcni4h" targetRef="Event_1m2q52v">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=interestRate&gt;referenceInterestRate</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_17dar9z" sourceRef="Gateway_1hcni4h" targetRef="Activity_1wydumt">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=interestRate&lt;=referenceInterestRate</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Activity_1wydumt" name="Przeliczenie wartości kontraktu pozostałej do spłaty">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="calculateRemainingContractValue" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17dar9z</bpmn:incoming>
+      <bpmn:outgoing>Flow_1d10qyz</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1d10qyz" sourceRef="Activity_1wydumt" targetRef="Activity_04vpjfe" />
+    <bpmn:sequenceFlow id="Flow_084zcen" sourceRef="Activity_04vpjfe" targetRef="Activity_1llwb15" />
+    <bpmn:serviceTask id="Activity_1llwb15" name="Zapis do bazy">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="calculationsSave" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_084zcen</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bwlec0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_04vpjfe" name="Przeliczenie nowej wartości rat">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="calculateNewMonthlyPaymentAmount" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1d10qyz</bpmn:incoming>
+      <bpmn:outgoing>Flow_084zcen</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1gmclms">
+      <bpmn:incoming>Flow_0bwlec0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gcjcm5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0fkbjep</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0bwlec0" sourceRef="Activity_1llwb15" targetRef="Gateway_1gmclms" />
+    <bpmn:sequenceFlow id="Flow_1gcjcm5" sourceRef="Gateway_1gmclms" targetRef="Event_1m2q52v">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=newMonthlyPaymentAmount&gt;0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0fkbjep" sourceRef="Gateway_1gmclms" targetRef="Activity_1hvojie">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=newMonthlyPaymentAmount&lt;=0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0o7n8xj" sourceRef="Activity_1hvojie" targetRef="Event_1m2q52v" />
+    <bpmn:userTask id="Activity_1hvojie" name="Obsługa manulana">
+      <bpmn:incoming>Flow_0fkbjep</bpmn:incoming>
+      <bpmn:outgoing>Flow_0o7n8xj</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0juvuag" sourceRef="Activity_0awwch9" targetRef="Gateway_1hcni4h" />
+    <bpmn:serviceTask id="Activity_0awwch9" name="Pobranie wartości stopy referencyjnej">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="getInterestRate" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_03f2iv6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0juvuag</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="LoansCalculation">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1hcni4h_di" bpmnElement="Gateway_1hcni4h" isMarkerVisible="true">
+        <dc:Bounds x="545" y="152" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1m2q52v_di" bpmnElement="Event_1m2q52v">
+        <dc:Bounds x="1482" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dvb082_di" bpmnElement="Activity_1wydumt">
+        <dc:Bounds x="650" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1m464tz_di" bpmnElement="Activity_1llwb15">
+        <dc:Bounds x="970" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0m303nt_di" bpmnElement="Activity_04vpjfe">
+        <dc:Bounds x="810" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1gmclms_di" bpmnElement="Gateway_1gmclms" isMarkerVisible="true">
+        <dc:Bounds x="1135" y="265" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gwzoxh_di" bpmnElement="Activity_1hvojie">
+        <dc:Bounds x="1230" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xrkbof_di" bpmnElement="Activity_0awwch9">
+        <dc:Bounds x="340" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_03f2iv6_di" bpmnElement="Flow_03f2iv6">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="340" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rac37j_di" bpmnElement="Flow_1rac37j">
+        <di:waypoint x="570" y="152" />
+        <di:waypoint x="570" y="90" />
+        <di:waypoint x="1500" y="90" />
+        <di:waypoint x="1500" y="172" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17dar9z_di" bpmnElement="Flow_17dar9z">
+        <di:waypoint x="570" y="202" />
+        <di:waypoint x="570" y="290" />
+        <di:waypoint x="650" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d10qyz_di" bpmnElement="Flow_1d10qyz">
+        <di:waypoint x="750" y="290" />
+        <di:waypoint x="810" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_084zcen_di" bpmnElement="Flow_084zcen">
+        <di:waypoint x="910" y="290" />
+        <di:waypoint x="970" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bwlec0_di" bpmnElement="Flow_0bwlec0">
+        <di:waypoint x="1070" y="290" />
+        <di:waypoint x="1135" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gcjcm5_di" bpmnElement="Flow_1gcjcm5">
+        <di:waypoint x="1160" y="265" />
+        <di:waypoint x="1160" y="190" />
+        <di:waypoint x="1482" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fkbjep_di" bpmnElement="Flow_0fkbjep">
+        <di:waypoint x="1160" y="315" />
+        <di:waypoint x="1160" y="410" />
+        <di:waypoint x="1230" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0o7n8xj_di" bpmnElement="Flow_0o7n8xj">
+        <di:waypoint x="1330" y="410" />
+        <di:waypoint x="1500" y="410" />
+        <di:waypoint x="1500" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0juvuag_di" bpmnElement="Flow_0juvuag">
+        <di:waypoint x="440" y="177" />
+        <di:waypoint x="545" y="177" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
