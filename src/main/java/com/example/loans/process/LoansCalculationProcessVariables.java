@@ -1,11 +1,8 @@
-package com.example.loans;
+package com.example.loans.process;
 
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 @Builder

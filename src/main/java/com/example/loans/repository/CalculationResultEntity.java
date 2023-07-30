@@ -1,4 +1,4 @@
-package com.example.loans;
+package com.example.loans.repository;
 
 import jakarta.persistence.*;
 import lombok.Builder;

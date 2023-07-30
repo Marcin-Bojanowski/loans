@@ -1,5 +1,6 @@
-package com.example.loans;
+package com.example.loans.controller;
 
+import com.example.loans.service.LoansFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -15,6 +15,7 @@ public class CalculateNewMonthlyPaymentAmount {
     public Map<String, Object> calculateNewMonthlyPaymentAmount(JobClient client, ActivatedJob job) throws Exception {
         Map<String, Object> variables = new HashMap<>();
         Map<String, Object> processVariables = job.getVariablesAsMap();
+
         Double referenceInterestRate = (Double) processVariables.get("referenceInterestRate");
         Integer remainingNumberOfPayments = (Integer) processVariables.get("remainingNumberOfPayments");
         Double remainingContractValue = (Double) processVariables.get("remainingContractValue");
@@ -23,7 +24,6 @@ public class CalculateNewMonthlyPaymentAmount {
         double numerator = remainingContractValue * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, remainingNumberOfPayments);
         double denominator = Math.pow(1 + monthlyInterestRate, remainingNumberOfPayments) - 1;
         double newMonthlyPaymentAmount = numerator / denominator;
-
         variables.put("newMonthlyPaymentAmount", newMonthlyPaymentAmount);
 
         return variables;

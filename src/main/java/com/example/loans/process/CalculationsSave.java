@@ -1,7 +1,7 @@
 package com.example.loans.process;
 
-import com.example.loans.CalculationResultEntity;
-import com.example.loans.LoansFacade;
+import com.example.loans.repository.CalculationResultEntity;
+import com.example.loans.service.LoansFacade;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import io.camunda.zeebe.client.api.worker.JobClient;
 import io.camunda.zeebe.spring.client.annotation.JobWorker;

@@ -1,12 +1,8 @@
-package com.example.loans;
+package com.example.loans.controller;
 
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NonNull;
-
-import java.math.BigDecimal;
 
 @Data
 public class LoansDTO {
